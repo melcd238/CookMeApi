@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const recipeSchema = mongoose.Schema({
     title: { type: String, required: true },
-    liked: { type: Boolean, required : true },
+    liked: { type: Boolean, required : true , default: false},
     ingredients: { type: [String], required: true },
     instructions: { type: [{ etape :String, content: String}], required: true },
     timePreparation: { type: String, required: true },

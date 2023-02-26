@@ -6,6 +6,7 @@ const app = express();
 
 const userRoutes = require('./routes/user');
 const recipeRoutes = require('./routes/recipe');
+const ingredientRoutes = require('./routes/ingredient');
 
 const bddMongoose = `mongodb+srv://${process.env.BDD_USER}:${process.env.BDD_PASSWORD}@cluster0.p8ezh79.mongodb.net/?retryWrites=true&w=majority`
 
@@ -25,6 +26,7 @@ app.use(express.json());
 
 app.use('/api/auth', userRoutes);
 app.use('/api/recipes', recipeRoutes);
+app.use('/api/ingredients', ingredientRoutes);
 
 
 module.exports = app;

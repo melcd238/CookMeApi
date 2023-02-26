@@ -52,4 +52,13 @@ exports.deleteRecipe = (req, res, next) => {
         .catch(error => res.status(400).json({ error }));
 }
 
+// mise a jour du liked d'une recette en fonction de son id que si l'utilisateur connecté est le propriétaire de la recette a true ou false
+
+exports.updateLikeRecipe = (req, res, next) => {
+    const userId = req.body.userId;
+    Recipe.updateOne({ _id: req.params.id, userId: userId }, { liked: req.body.liked })
+        .then(() => res.status(200).json({ message: 'like mis à jour!' }))
+        .catch(error => res.status(400).json({ error }));
+}
+
 
