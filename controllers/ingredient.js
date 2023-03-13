@@ -23,12 +23,12 @@ exports.createIngredient = (req, res, next) => {
 
 
 exports.getAllIngredients = (req, res, next) => {
-    const page =  parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 20;
+    //const page =  parseInt(req.query.page) || 1;
+   // const limit = parseInt(req.query.limit) || 20;
     
     Ingredient.find()
-    .skip((page - 1) * limit)
-    .limit(limit)
+   // .skip((page - 1) * limit)
+   // .limit(limit)
     .then(ingredients => res.status(200).json(ingredients))
     .catch(error => res.status(400).json({ error }));
 }
