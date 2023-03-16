@@ -9,6 +9,7 @@ exports.createRecipe = (req, res, next) => {
     const recipe = new Recipe({
         title: req.body.title,
         liked: false,
+        bookmarked: false,
         ingredients: req.body.ingredients,
         instructions: req.body.instructions,
         timePreparation: req.body.timePreparation,
@@ -25,12 +26,28 @@ exports.createRecipe = (req, res, next) => {
 };
 
 // récupération de toutes les recettes de la base de données en fonction de l'utilisateur connecté
-
 exports.getAllRecipes = (req, res, next) => {
     const userId = req.body.userId;
-    // on récupère toutes les recettes de la base de données que si le userId correspond à celui de l'utilisateur connecté
-    Recipe.find({ userId: userId })
-        .then(recipes => res.status(200).json(recipes))
+    const page =  parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 8;
+    const search = req.query.search || '';
+
+    const filter = { userId: userId };
+    if (search) {
+        filter.title = { $regex: new RegExp(search, 'i') };
+    }
+
+    Recipe.find(filter)
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .then(recipes =>{
+            Recipe.countDocuments({ userId: userId}, (error , count) =>{
+                if (error) {
+                    return res.status(500).json({ error });
+                }
+                res.status(200).json({recipes, hasMore: page * limit < count});
+            })
+        })
         .catch(error => res.status(400).json({ error }));
 };
 
@@ -58,6 +75,24 @@ exports.updateLikeRecipe = (req, res, next) => {
     const userId = req.body.userId;
     Recipe.updateOne({ _id: req.params.id, userId: userId }, { liked: req.body.liked })
         .then(() => res.status(200).json({ message: 'like mis à jour!' }))
+        .catch(error => res.status(400).json({ error }));
+}
+
+// mise a jour du bookmarked d'une recette en fonction de son id que si l'utilisateur connecté est le propriétaire de la recette a true ou false
+
+exports.updateBookmarkRecipe = (req, res, next) => {
+    const userId = req.body.userId;
+    Recipe.updateOne({ _id: req.params.id, userId: userId }, { bookmarked: req.body.bookmarked })
+        .then(() => res.status(200).json({ message: 'bookmark mis à jour!' }))
+        .catch(error => res.status(400).json({ error }));
+}
+
+// récupération de toute les recettes qui ont un bookmarked a true en fonction de l'utilisateur connecté
+
+exports.getAllBookmarkedRecipes = (req, res, next) => {
+    const userId = req.body.userId;
+    Recipe.find({ userId: userId, bookmarked: true })
+        .then(recipes => res.status(200).json(recipes))
         .catch(error => res.status(400).json({ error }));
 }
 
